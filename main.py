@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+    #!/usr/bin/python3
 import os
 import pickle
 import sys
@@ -471,88 +471,87 @@ class IPATool(object):
             appVerId = downInfo.metadata.softwareVersionExternalIdentifier
             # when downloading history versions, bundleShortVersionString will always give a wrong version number (the newest one)
             # should use bundleVersion in these cases
-            appVer = downInfo.metadata.bundleShortVersionString if not self.appVerId else downInfo.metadata.bundleVersion
+            # appVer = downInfo.metadata.bundleShortVersionString if not self.appVerId else downInfo.metadata.bundleVersion
 
-            logger.info(f'Downloading app {appName} ({appBundleId}) with appId {appId} (version {appVer}, versionId {appVerId})')
+            # logger.info(f'Downloading app {appName} ({appBundleId}) with appId {appId} (version {appVer}, versionId {appVerId})')
 
-            # if self.appInfo:
-            filename = '%s-%s-%s-%s.ipa' % (appBundleId,
-                                            appVer,
-                                            appId,
-                                            appVerId)
+            # # if self.appInfo:
+            # filename = '%s-%s-%s-%s.ipa' % (appBundleId,
+            #                                 appVer,
+            #                                 appId,
+            #                                 appVerId)
             # else:
             #     filename = '%s-%s.ipa' % (self.appId, appVerId)
 
-            filepath = os.path.join(args.output_dir, filename)
-            logger.info("Downloading ipa to %s" % filepath)
-            downloadFile(downInfo.URL, filepath)
-            metadata = downInfo.metadata.as_dict()
-            if appleid:
-                metadata["apple-id"] = appleid
-                metadata["userName"] = appleid
-            logger.info("Writing out iTunesMetadata.plist...")
-            if zipfile.is_zipfile(filepath):
-                with zipfile.ZipFile(filepath, 'a') as ipaFile:
-                    logger.debug("Writing iTunesMetadata.plist")
-                    ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
-                    logger.debug("Writing IPAToolInfo.plist")
-                    ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
+            # filepath = os.path.join(args.output_dir, filename)
+            # logger.info("Downloading ipa to %s" % filepath)
+            # downloadFile(downInfo.URL, filepath)
+            # metadata = downInfo.metadata.as_dict()
+            # if appleid:
+            #     metadata["apple-id"] = appleid
+            #     metadata["userName"] = appleid
+            # logger.info("Writing out iTunesMetadata.plist...")
+            # if zipfile.is_zipfile(filepath):
+            #     with zipfile.ZipFile(filepath, 'a') as ipaFile:
+            #         logger.debug("Writing iTunesMetadata.plist")
+            #         ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
+            #         logger.debug("Writing IPAToolInfo.plist")
+            #         ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
 
-                    def findAppContentPath(c):
-                        if not c.startswith('Payload/'):
-                            return False
-                        pathparts = c.strip('/').split('/')
-                        if len(pathparts) != 2:
-                            return False
-                        if not pathparts[1].endswith(".app"):
-                            return False
-                        return True
-                    appContentDirChoices = [c for c in ipaFile.namelist() if findAppContentPath(c)]
-                    if len(appContentDirChoices) != 1:
-                        raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
-                    appContentDir = appContentDirChoices[0].rstrip('/')
+            #         def findAppContentPath(c):
+            #             if not c.startswith('Payload/'):
+            #                 return False
+            #             pathparts = c.strip('/').split('/')
+            #             if len(pathparts) != 2:
+            #                 return False
+            #             if not pathparts[1].endswith(".app"):
+            #                 return False
+            #             return True
+            #         appContentDirChoices = [c for c in ipaFile.namelist() if findAppContentPath(c)]
+            #         if len(appContentDirChoices) != 1:
+            #             raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
+            #         appContentDir = appContentDirChoices[0].rstrip('/')
 
-                    processedSinf = False
-                    if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
-                        #Try to get the Manifest.plist file, since it doesn't always exist.
-                        scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
-                        logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
-                        scManifest = plistlib.loads(scManifestData)
-                        sinfs = {c.id: c.sinf for c in downInfo.sinfs}
-                        if 'SinfPaths' in scManifest:
-                            for i, sinfPath in enumerate(scManifest['SinfPaths']):
-                                logger.debug("Writing sinf to %s", sinfPath)
-                                ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
-                            processedSinf = True
-                    if not processedSinf:
-                        logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
-                        infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
-                        infoList = plistlib.loads(infoListData)
-                        sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
-                        logger.debug("Writing sinf to %s", sinfPath)
-                        #Assuming there is only one .sinf file, hence the 0
-                        ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
-                        processedSinf = True
+            #         processedSinf = False
+            #         if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
+            #             #Try to get the Manifest.plist file, since it doesn't always exist.
+            #             scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
+            #             logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
+            #             scManifest = plistlib.loads(scManifestData)
+            #             sinfs = {c.id: c.sinf for c in downInfo.sinfs}
+            #             if 'SinfPaths' in scManifest:
+            #                 for i, sinfPath in enumerate(scManifest['SinfPaths']):
+            #                     logger.debug("Writing sinf to %s", sinfPath)
+            #                     ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+            #                 processedSinf = True
+            #         if not processedSinf:
+            #             logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
+            #             infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
+            #             infoList = plistlib.loads(infoListData)
+            #             sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
+            #             logger.debug("Writing sinf to %s", sinfPath)
+            #             #Assuming there is only one .sinf file, hence the 0
+            #             ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
+            #             processedSinf = True
 
-                logger.info("Downloaded ipa to %s" % filename)
-            else:
-                plist = filepath[:-4]+".info.plist"
-                with open(plist, "wb") as f:
-                    f.write(plistlib.dumps(downResp.as_dict()))
-                plist = filepath[:-4]+".plist"
-                with open(plist, "wb") as f:
-                    f.write(plistlib.dumps(metadata))
-                logger.info("Downloaded ipa to %s and plist to %s" % (filename, plist))
+            #     logger.info("Downloaded ipa to %s" % filename)
+            # else:
+            #     plist = filepath[:-4]+".info.plist"
+            #     with open(plist, "wb") as f:
+            #         f.write(plistlib.dumps(downResp.as_dict()))
+            #     plist = filepath[:-4]+".plist"
+            #     with open(plist, "wb") as f:
+            #         f.write(plistlib.dumps(metadata))
+            #     logger.info("Downloaded ipa to %s and plist to %s" % (filename, plist))
 
             self._outputJson({
                 "appName": appName,
                 "appBundleId": appBundleId,
-                "appVer": appVer,
-                "appId": appId,
-                "appVerId": appVerId,
-
-                "downloadedIPA": filepath,
-                "downloadedVerId": appVerId,
+                # "appVer": appVer,
+                # "appId": appId,
+                # "appVerId": appVerId,
+                # "downloadedIPA": filepath,
+                # "downloadedVerId": appVerId,
                 "downloadURL": downInfo.URL,
             })
         except StoreException as e:
