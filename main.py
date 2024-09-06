@@ -229,11 +229,19 @@ class IPATool(object):
 
     storeClientCache = {}
     def _get_StoreClient(self, args):
-        for k, v in self.storeClientCache.items():
-            if time.time() - v < 30.0:
-                return k
-            else:
-                del self.storeClientCache[k]
+        cachekey = args.itunes_server or args.appleid
+        store, lastseen = self.storeClientCache.get(cachekey, (None, None,)) 
+        if store:
+            if time.time() - lastseen < 30.0:
+                return store
+            del self.storeClientCache[cachekey]
+            # https://github.com/NyaMisty/ipatool-py/pull/43/files
+
+        # for k, v in self.storeClientCache.items():
+        #     if time.time() - v < 30.0:
+        #         return k
+        #     else:
+        #         del self.storeClientCache[k]
 
         newSess = pickle.loads(pickle.dumps(self.sess))
         Store = StoreClient(newSess)
@@ -314,7 +322,9 @@ class IPATool(object):
             Store.sess.original_post = Store.sess.post
             Store.sess.post = authedPost
 
-        self.storeClientCache[Store] = time.time()
+        # self.storeClientCache[Store] = time.time()
+# https://github.com/NyaMisty/ipatool-py/pull/43/files
+        self.storeClientCache[cachekey] = (Store, time.time(),)
         return Store
 
     def _handleStoreException(self, _e):
