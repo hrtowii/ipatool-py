@@ -191,6 +191,7 @@ class IPATool(object):
 
         if outJson and self.jsonOut:
             print(json.dumps(self.jsonOut, ensure_ascii=False))
+            return json.dumps(self.jsonOut, ensure_ascii=False)
 
     def _outputJson(self, obj):
         self.jsonOut = obj
@@ -423,6 +424,7 @@ class IPATool(object):
                     self.downloadOne(args)
                     if args.out_json and self.jsonOut:
                         print(json.dumps(self.jsonOut, ensure_ascii=False))
+                        return json.dumps(self.jsonOut, ensure_ascii=False)
                     if self.jsonOut is not None:  # successfully finished
                         with open(stateFile, 'w') as f:
                             f.write('1')
@@ -464,7 +466,6 @@ class IPATool(object):
                 logger.fatal("failed to get app download info!")
                 raise StoreException('download', downResp, 'no songList')
             downInfo = downResp.songList[0]
-
             appName = downInfo.metadata.bundleDisplayName
             appId = downInfo.songId
             appBundleId = downInfo.metadata.softwareVersionBundleId
@@ -560,6 +561,7 @@ class IPATool(object):
 def main():
     tool = IPATool()
     tool.tool_main()
+    return json.dumps(tool.jsonOut, ensure_ascii=False)
 
 if __name__ == '__main__':
-    main()
+    print(main())
